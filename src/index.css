@@ -7,8 +7,8 @@
 }
 
 ::-webkit-scrollbar {
-  @apply h-3;
-  @apply w-3;
+  @apply h-2;
+  @apply w-2;
 }
 
 /* Track */
