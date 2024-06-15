@@ -1,4 +1,5 @@
 # Tailwind Calendar UI
+![image](https://github.com/chukwumaokere/tailwind-calendar-ui/assets/16673873/76cb7efd-fb79-4b6f-ba56-0f4cfddc6e37)
 
 Just a simple Calendar UI similar to that from TailwindCSS'  
 Will modify more  
