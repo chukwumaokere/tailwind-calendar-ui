@@ -9,7 +9,8 @@ export const events: Event[] = [
         location: 'Gym @ Home',
         backgroundColor: 'bg-blue-400/20',
         border: 'border-solid border border-white/10',
-        textColor: 'text-white'
+        textColor: 'text-white',
+        link: 'https://google.com',
     },
     {
         title: 'Workout',
@@ -18,7 +19,8 @@ export const events: Event[] = [
         location: '24 E. Washington',
         backgroundColor: 'bg-purple-400/20',
         border: 'border-solid border border-white/10',
-        textColor: 'text-white'
+        textColor: 'text-white',
+        link: 'https://google.com',
     },
     {
         title: 'Workout',
@@ -27,7 +29,8 @@ export const events: Event[] = [
         location: '24 E. Washington',
         backgroundColor: 'bg-amber-400/20',
         border: 'border-solid border border-white/10',
-        textColor: 'text-white'
+        textColor: 'text-white',
+        link: 'https://google.com',
     },
     {
         title: 'Grocery Shopping',
@@ -36,7 +39,8 @@ export const events: Event[] = [
         location: 'Marianos on Clark',
         backgroundColor: 'bg-emerald-400/20',
         border: 'border-solid border border-white/10',
-        textColor: 'text-white'
+        textColor: 'text-white',
+        link: 'https://google.com',
     },
     {
         title: 'Grocery Shopping',
@@ -45,7 +49,8 @@ export const events: Event[] = [
         location: 'Marianos on Clark',
         backgroundColor: 'bg-orange-400/20',
         border: 'border-solid border border-white/10',
-        textColor: 'text-white'
+        textColor: 'text-white',
+        link: 'https://google.com',
     },
     {
         title: 'Buy Ferrari',
@@ -54,7 +59,8 @@ export const events: Event[] = [
         location: 'Ferrari Dealership',
         backgroundColor: 'bg-red-400/20',
         border: 'border-solid border border-white/10',
-        textColor: 'text-white'
+        textColor: 'text-white',
+        link: 'https://tailwindcss.com',
     },
     {
         title: 'Sleep',
@@ -63,6 +69,6 @@ export const events: Event[] = [
         location: 'Day off',
         backgroundColor: 'bg-stone-400/20',
         border: 'border-solid border border-white/10',
-        textColor: 'text-white'
+        textColor: 'text-white',
     },
 ];

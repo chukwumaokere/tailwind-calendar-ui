@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 export interface Event { 
     title: string;
@@ -8,6 +8,7 @@ export interface Event {
     backgroundColor: string;
     border: string;
     textColor: string;
+    link?: string;
 }
 
 // Find a way to derive these values from the data
@@ -31,15 +32,17 @@ export interface CalendarProps {
     subtitle?: string, 
     days?: string[], 
     hours?: string[], 
-    events: Event[]
+    events: Event[],
+    maxHeight?: string,
 }
-export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = DEFAULT_HOURS, events}: CalendarProps) {
+
+export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = DEFAULT_HOURS, events, maxHeight}: CalendarProps) {
     
     return (
         <>
             {title ? <h1 className='text-2xl text-white'>{title}</h1> : null}
             {subtitle ? <h1 className='text-xl text-white'>{subtitle}</h1> : null}
-            <div className={`overflow-auto grid grid-cols-[70px,repeat(${days.length},150px)] grid-rows-[auto,repeat(${hours.length},50px)] `}>
+            <div className={`overflow-auto grid grid-cols-[70px,repeat(${days.length},150px)] grid-rows-[auto,repeat(${hours.length},50px)] ${maxHeight} w-fit px-1`}>
                 {/*Empty Corner Tile*/}
                 <div className="row-start-[1] col-start-[1] sticky top-0 z-10 bg-white dark:bg-gradient-to-b dark:from-slate-600 dark:to-slate-700 border-slate-100 dark:border-black/10 bg-clip-padding text-slate-900 dark:text-slate-200 border-b text-sm font-medium py-2"></div>
                 
@@ -59,21 +62,31 @@ export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = 
 
                 {/* Events Processing */}
                 {events.map((event, index) => {
-                    const startHour = event.startDate.getHours();
-                    const startRow = startHour - HOUR_OFFSET;
-                    const startCol = event.startDate.getDay() + COLUMN_OFFSET;
-                    const rowSpan =  event.endDate.getHours() - startHour;
-                    
-                    return (
-                        <div key={index} className={`row-start-[${startRow}] row-[span_${rowSpan}/_span_${rowSpan}] col-start-[${startCol}] ${event.backgroundColor} ${event.border} ${event.textColor} rounded-lg `}>
-                            <div className='text-xxs/[.75rem] extra-tight px-2 font-medium'>{startHour % 12}{startHour > 12 ? 'PM' : 'AM'}</div>
-                            <div className='text-sm px-2 font-medium'>{event.title}</div>
-                            <div className='text-xxs/[.75rem] extra-tight px-2 font-medium'>{event.location}</div>
-                        </div>
-                    )
+                    return <Event event={event} index={index} />
                 })}
                 {/* /Events Processing */}
             </div>
         </>
+    )
+}
+
+function Event({event, index}: {event: Event, index: number}) {
+    const startHour = event.startDate.getHours();
+    const startRow = startHour - HOUR_OFFSET;
+    const startCol = event.startDate.getDay() + COLUMN_OFFSET;
+    const rowSpan =  event.endDate.getHours() - startHour;
+
+    const onClick = useCallback(() => {
+        if(event.link) {
+            window.open(event.link, '_blank');
+        }
+    }, [event.link]);
+    
+    return (
+        <div key={index} onClick={onClick} className={`row-start-[${startRow}] row-[span_${rowSpan}/_span_${rowSpan}] col-start-[${startCol}] ${event.backgroundColor} ${event.border} ${event.textColor} rounded-lg ${event.link && 'cursor-pointer'}`}>
+            <div className='text-xxs/[.75rem] extra-tight px-2 font-medium'>{startHour % 12}{startHour > 12 ? 'PM' : 'AM'}</div>
+            <div className='text-sm px-2 font-medium'>{event.title}</div>
+            <div className='text-xxs/[.75rem] extra-tight px-2 font-medium'>{event.location}</div>
+        </div>
     )
 }
