@@ -19,5 +19,6 @@ TODOS:
 - [x] Add pointer to the event item
 - [ ] Add links to events
 - [ ] Allow height adjust
-- [ ] Add hover effects
+- [x] Add hover effects
+- [ ] Add current day highlight
 
