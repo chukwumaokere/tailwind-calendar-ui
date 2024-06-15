@@ -39,7 +39,7 @@ export interface CalendarProps {
     showCalendarDateLabel?: boolean,
 }
 
-export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = DEFAULT_HOURS, events, maxHeight, showCalendarDateLabel = true}: CalendarProps) {
+export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = DEFAULT_HOURS, events, maxHeight, showCalendarDateLabel = false}: CalendarProps) {
     const currentDate = new Date();
     return (
         <>
