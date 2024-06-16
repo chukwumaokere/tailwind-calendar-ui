@@ -6,7 +6,8 @@ Will modify more
 Plan to use for some sites to show some events in a neat way  
 
 TODOS:
-- [ ] Drag and Drop
+- [x] Drag and Drop
+- [ ] Have drag and drop affect actual data
 - [ ] Resize events 
 - [ ] Dynamically add/remove events
 - [ ] Truncate titles in events

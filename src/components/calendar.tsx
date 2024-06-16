@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 export interface Event { 
     title: string;
@@ -41,6 +41,7 @@ export interface CalendarProps {
 
 export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = DEFAULT_HOURS, events, maxHeight, showCalendarDateLabel = false}: CalendarProps) {
     const currentDate = new Date();
+    const TILES = days.length * hours.length;
     return (
         <>
             {title ? <h1 className='text-2xl text-white'>{title}</h1> : null}
@@ -55,18 +56,18 @@ export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = 
                     <div key={index} className={`row-start-[1] col-start-[${index + COLUMN_OFFSET}] sticky top-0 z-10 bg-white dark:bg-gradient-to-b dark:from-slate-600 dark:to-slate-700 border-slate-100 dark:border-black/10 bg-clip-padding text-slate-900 dark:text-slate-200 border-b text-sm font-medium py-2 text-center`}>{day}</div>
                 ))}
                 {hours.map((hour, index) => (
-                <div className={`row-start-[${index + ROW_OFFSET}] col-start-[1] border-slate-100 dark:border-slate-200/5 border-r text-xs p-1.5 text-right text-slate-400 uppercase sticky left-0 bg-white dark:bg-slate-800 font-medium`}>{hour}</div> 
+                <div  key={index} className={`row-start-[${index + ROW_OFFSET}] col-start-[1] border-slate-100 dark:border-slate-200/5 border-r text-xs p-1.5 text-right text-slate-400 uppercase sticky left-0 bg-white dark:bg-slate-800 font-medium`}>{hour}</div> 
                 ))}
-                {Array.from({length: days.length * hours.length}).map((_, index) => {
+                {Array.from({length: TILES}).map((_, index) => {
                     return (
-                        <div key={index} className={`row-start-[${getTileRowNumber(index, days.length)}] col-start-[${getTileColumnNumber(index, days.length)}] border-slate-100 dark:border-slate-200/5 border-b border-r`}></div>
+                        <div key={index} data-object="tile" className={`row-start-[${getTileRowNumber(index, days.length)}] col-start-[${getTileColumnNumber(index, days.length)}] border-slate-100 dark:border-slate-200/5 border-b border-r`}></div>
                     )
                 })}
                 {/* /Calendar Setup*/}
 
                 {/* Events Processing */}
                 {events.map((event, index) => {
-                    return <Event event={event} index={index} />
+                    return <Event key={index} event={event} />
                 })}
                 {/* /Events Processing */}
             </div>
@@ -74,7 +75,7 @@ export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = 
     )
 }
 
-function Event({event, index}: {event: Event, index: number}) {
+function Event({event}: {event: Event}) {
     const startHour = event.startDate.getHours();
     const startRow = startHour - HOUR_OFFSET;
     const startCol = event.startDate.getDay() + COLUMN_OFFSET;
@@ -85,9 +86,21 @@ function Event({event, index}: {event: Event, index: number}) {
             window.open(event.link, '_blank');
         }
     }, [event.link]);
+
+    const [position, setPosition] = useState({
+        Y: `row-start-[${startRow}]`,
+        X: `col-start-[${startCol}]`
+    });
+
+    const dragEvent = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+        const tileUnderMouse = document.elementsFromPoint(event.clientX, event.clientY).find((element) => element.getAttribute('data-object') === 'tile') as HTMLDivElement;
+        const Y = tileUnderMouse.classList[0];
+        const X = tileUnderMouse.classList[1];
+        setPosition({X, Y});
+    }, []);
     
     return (
-        <div key={index} onClick={onClick} className={`row-start-[${startRow}] row-[span_${rowSpan}/_span_${rowSpan}] col-start-[${startCol}] ${event.backgroundColor} ${event.border} ${event.textColor} rounded-lg ${event.link && 'cursor-pointer'}`}>
+        <div onClick={onClick} onDragEnd={dragEvent} draggable={true} className={`${Object.values(position).join(' ')} row-[span_${rowSpan}/_span_${rowSpan}] ${event.backgroundColor} ${event.border} ${event.textColor} ${event.link && 'cursor-pointer'} rounded-lg resize`}>
             <div className='text-xxs/[.75rem] extra-tight px-2 font-medium'>{startHour % 12}{startHour > 12 ? 'PM' : 'AM'}</div>
             <div className='text-sm px-2 font-medium'>{event.title}</div>
             <div className='text-xxs/[.75rem] extra-tight px-2 font-medium'>{event.location}</div>
