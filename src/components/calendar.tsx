@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 
 export interface Event { 
+    id: string | number,
     title: string;
     startDate: Date;
     endDate: Date;
@@ -15,7 +16,7 @@ export interface Event {
 const ROW_OFFSET = 2;
 const COLUMN_OFFSET = 2;
 const HOUR_OFFSET = 3;
-const MONTH_OFFSET = 1;
+const MONTH_OFFSET = 0;
 
 function getTileRowNumber(index: number, denominator: number) {
     return Math.floor(index / denominator) + ROW_OFFSET;
@@ -37,9 +38,10 @@ export interface CalendarProps {
     events: Event[],
     maxHeight?: string,
     showCalendarDateLabel?: boolean,
+    onDragSuccess?: (id: Event['id'], startDate: Date, endDate: Date) => void
 }
 
-export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = DEFAULT_HOURS, events, maxHeight, showCalendarDateLabel = false}: CalendarProps) {
+export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = DEFAULT_HOURS, events, maxHeight, showCalendarDateLabel = false, onDragSuccess}: CalendarProps) {
     const currentDate = new Date();
     const TILES = days.length * hours.length;
     return (
@@ -67,7 +69,7 @@ export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = 
 
                 {/* Events Processing */}
                 {events.map((event, index) => {
-                    return <Event key={index} event={event} />
+                    return <Event key={index} event={event} onDragSuccess={onDragSuccess} />
                 })}
                 {/* /Events Processing */}
             </div>
@@ -75,7 +77,7 @@ export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = 
     )
 }
 
-function Event({event}: {event: Event}) {
+function Event({event, onDragSuccess}: {event: Event, onDragSuccess?: CalendarProps['onDragSuccess']}) {
     const startHour = event.startDate.getHours();
     const startRow = startHour - HOUR_OFFSET;
     const startCol = event.startDate.getDay() + COLUMN_OFFSET;
@@ -92,15 +94,32 @@ function Event({event}: {event: Event}) {
         X: `col-start-[${startCol}]`
     });
 
-    const dragEvent = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-        const tileUnderMouse = document.elementsFromPoint(event.clientX, event.clientY).find((element) => element.getAttribute('data-object') === 'tile') as HTMLDivElement;
+    const dragEndEvent = useCallback((dragEvent: React.DragEvent<HTMLDivElement>) => {
+        const tileUnderMouse = document.elementsFromPoint(dragEvent.clientX, dragEvent.clientY).find((element) => element.getAttribute('data-object') === 'tile') as HTMLDivElement;
         const Y = tileUnderMouse.classList[0];
         const X = tileUnderMouse.classList[1];
         setPosition({X, Y});
-    }, []);
-    
+
+        // Calculate new start and end dates based on the new position
+        const rowHourDroppedOn = parseInt(Y.replace('row-start-[', '').replace(']', '')) + HOUR_OFFSET;
+        const newStartHour = rowHourDroppedOn;
+
+        const columnDayDroppedOn = parseInt(X.replace('col-start-[', '').replace(']', ''));
+
+        const newStartDate = new Date(event.startDate);
+        newStartDate.setUTCHours(newStartHour);
+        newStartDate.setUTCDate(event.startDate.getDate() + columnDayDroppedOn - startCol);
+        
+        const newEndDate = new Date(newStartDate);
+        newEndDate.setUTCHours(newStartDate.getUTCHours() + rowSpan);
+
+        onDragSuccess && onDragSuccess(event.id, newStartDate, newEndDate);
+        console.log('New Start Date:', newStartDate.toUTCString());
+        console.log('New End Date:', newEndDate.toUTCString());
+    }, [event.startDate, startHour, rowSpan]);
+
     return (
-        <div onClick={onClick} onDragEnd={dragEvent} draggable={true} className={`${Object.values(position).join(' ')} row-[span_${rowSpan}/_span_${rowSpan}] ${event.backgroundColor} ${event.border} ${event.textColor} ${event.link && 'cursor-pointer'} rounded-lg resize`}>
+        <div onClick={onClick} onDragEnd={dragEndEvent} draggable={true} className={`${Object.values(position).join(' ')} row-[span_${rowSpan}/_span_${rowSpan}] ${event.backgroundColor} ${event.border} ${event.textColor} ${event.link && 'cursor-pointer'} rounded-lg resize`}>
             <div className='text-xxs/[.75rem] extra-tight px-2 font-medium'>{startHour % 12}{startHour > 12 ? 'PM' : 'AM'}</div>
             <div className='text-sm px-2 font-medium'>{event.title}</div>
             <div className='text-xxs/[.75rem] extra-tight px-2 font-medium'>{event.location}</div>

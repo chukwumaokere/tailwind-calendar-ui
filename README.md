@@ -7,7 +7,8 @@ Plan to use for some sites to show some events in a neat way
 
 TODOS:
 - [x] Drag and Drop
-- [ ] Have drag and drop affect actual data
+- [x] Have drag and drop affect actual data
+- [ ] Fix drop in same location time changing to user local time
 - [ ] Resize events 
 - [ ] Dynamically add/remove events
 - [ ] Truncate titles in events
@@ -15,7 +16,7 @@ TODOS:
 - [ ] Support multiple months and weeks
 - [ ] Sticky header when scrolling through months
 - [ ] Swap between list and Calendar?
-- [ ] Normalikze const rowSpan for 24 hour format 
+- [ ] Normalize const rowSpan for 24 hour format 
 - [x] Move calendar item to event component
 - [x] Add pointer to the event item
 - [ ] Add links to events

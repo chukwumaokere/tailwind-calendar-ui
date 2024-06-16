@@ -3,6 +3,7 @@ import { Event } from "./components/calendar";
 
 export const events: Event[] = [
     {
+        id: 0,
         title: 'Workout',
         startDate: new Date('2024-06-16 09:00:00'),
         endDate: new Date('2024-06-16 12:00:00'),
@@ -13,6 +14,7 @@ export const events: Event[] = [
         link: 'https://google.com',
     },
     {
+        id: 1,
         title: 'Workout',
         startDate: new Date('2024-06-17 05:00:00'),
         endDate: new Date('2024-06-17 09:00:00'),
@@ -23,6 +25,7 @@ export const events: Event[] = [
         link: 'https://google.com',
     },
     {
+        id: 2,
         title: 'Workout',
         startDate: new Date('2024-06-17 16:00:00'),
         endDate: new Date('2024-06-17 20:00:00'),
@@ -33,6 +36,7 @@ export const events: Event[] = [
         link: 'https://google.com',
     },
     {
+        id: 3,
         title: 'Grocery Shopping',
         startDate: new Date('2024-06-17 14:00:00'),
         endDate: new Date('2024-06-17 18:00:00'),
@@ -43,6 +47,7 @@ export const events: Event[] = [
         link: 'https://google.com',
     },
     {
+        id: 4,
         title: 'Grocery Shopping',
         startDate: new Date('2024-06-19 11:00:00'),
         endDate: new Date('2024-06-19 12:00:00'),
@@ -53,6 +58,7 @@ export const events: Event[] = [
         link: 'https://google.com',
     },
     {
+        id: 5,
         title: 'Buy Ferrari',
         startDate: new Date('2024-06-20 09:00:00'),
         endDate: new Date('2024-06-20 11:00:00'),
@@ -63,6 +69,7 @@ export const events: Event[] = [
         link: 'https://tailwindcss.com',
     },
     {
+        id: 6,
         title: 'Sleep',
         startDate: new Date('2024-06-22 05:00:00'),
         endDate: new Date('2024-06-22 23:00:00'),
