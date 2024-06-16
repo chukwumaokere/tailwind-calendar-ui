@@ -124,7 +124,7 @@ function Event({event, onDragSuccess, logEvents}: {event: Event, onDragSuccess?:
     return (
         <div onClick={onClick} onDragEnd={dragEndEvent} draggable={true} className={`${Object.values(position).join(' ')} row-[span_${rowSpan}/_span_${rowSpan}] ${event.backgroundColor} ${event.border} ${event.textColor} ${event.link && 'cursor-pointer'} rounded-lg resize`} 
         title={hoverText}>
-            <div className='text-xxs/[.75rem] extra-tight px-2 font-medium truncate'>{startHour % 12}{startHour > 12 ? 'PM' : 'AM'}</div>
+            <div className='text-xxs/[.75rem] extra-tight px-2 font-medium truncate'>{startHour % 12 === 0 ? '12' : startHour % 12}{startHour > 12 ? 'PM' : 'AM'}</div>
             <div className='text-sm px-2 font-medium truncate'>{event.title}</div>
             <div className='text-xxs/[.75rem] extra-tight px-2 font-medium truncate'>{event.location}</div>
         </div>
