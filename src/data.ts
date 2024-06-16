@@ -48,7 +48,7 @@ export const events: Event[] = [
     },
     {
         id: 4,
-        title: 'Grocery Shopping',
+        title: 'Grocery Shopping for More Protein',
         startDate: new Date('2024-06-19 11:00:00'),
         endDate: new Date('2024-06-19 12:00:00'),
         location: 'Marianos on Clark',

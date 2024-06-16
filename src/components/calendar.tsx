@@ -38,10 +38,11 @@ export interface CalendarProps {
     events: Event[],
     maxHeight?: string,
     showCalendarDateLabel?: boolean,
-    onDragSuccess?: (id: Event['id'], startDate: Date, endDate: Date) => void
+    onDragSuccess?: (id: Event['id'], startDate: Date, endDate: Date) => void,
+    logEvents?: boolean,
 }
 
-export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = DEFAULT_HOURS, events, maxHeight, showCalendarDateLabel = false, onDragSuccess}: CalendarProps) {
+export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = DEFAULT_HOURS, events, maxHeight, showCalendarDateLabel = false, onDragSuccess, logEvents = false}: CalendarProps) {
     const currentDate = new Date();
     const TILES = days.length * hours.length;
     return (
@@ -69,7 +70,7 @@ export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = 
 
                 {/* Events Processing */}
                 {events.map((event, index) => {
-                    return <Event key={index} event={event} onDragSuccess={onDragSuccess} />
+                    return <Event key={index} event={event} onDragSuccess={onDragSuccess} logEvents={logEvents} />
                 })}
                 {/* /Events Processing */}
             </div>
@@ -77,7 +78,7 @@ export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = 
     )
 }
 
-function Event({event, onDragSuccess}: {event: Event, onDragSuccess?: CalendarProps['onDragSuccess']}) {
+function Event({event, onDragSuccess, logEvents}: {event: Event, onDragSuccess?: CalendarProps['onDragSuccess'], logEvents?: CalendarProps['logEvents']}) {
     const startHour = event.startDate.getHours();
     const startRow = startHour - HOUR_OFFSET;
     const startCol = event.startDate.getDay() + COLUMN_OFFSET;
@@ -107,22 +108,25 @@ function Event({event, onDragSuccess}: {event: Event, onDragSuccess?: CalendarPr
         const columnDayDroppedOn = parseInt(X.replace('col-start-[', '').replace(']', ''));
 
         const newStartDate = new Date(event.startDate);
-        newStartDate.setUTCHours(newStartHour);
-        newStartDate.setUTCDate(event.startDate.getDate() + columnDayDroppedOn - startCol);
+        newStartDate.setHours(newStartHour);
+        newStartDate.setDate(event.startDate.getDate() + columnDayDroppedOn - startCol);
         
         const newEndDate = new Date(newStartDate);
-        newEndDate.setUTCHours(newStartDate.getUTCHours() + rowSpan);
+        newEndDate.setHours(newStartDate.getHours() + rowSpan);
 
         onDragSuccess && onDragSuccess(event.id, newStartDate, newEndDate);
-        console.log('New Start Date:', newStartDate.toUTCString());
-        console.log('New End Date:', newEndDate.toUTCString());
+        logEvents && console.log('Event ID:', event.id, 'New Start Date:', newStartDate);
+        logEvents && console.log('Event ID', event.id, 'New End Date:', newEndDate);
     }, [event.startDate, startHour, rowSpan]);
 
+    const hoverText = `${event.title} - ${event.location}\n${event.startDate.toLocaleString()} - ${event.endDate.toLocaleString()}`;
+
     return (
-        <div onClick={onClick} onDragEnd={dragEndEvent} draggable={true} className={`${Object.values(position).join(' ')} row-[span_${rowSpan}/_span_${rowSpan}] ${event.backgroundColor} ${event.border} ${event.textColor} ${event.link && 'cursor-pointer'} rounded-lg resize`}>
-            <div className='text-xxs/[.75rem] extra-tight px-2 font-medium'>{startHour % 12}{startHour > 12 ? 'PM' : 'AM'}</div>
-            <div className='text-sm px-2 font-medium'>{event.title}</div>
-            <div className='text-xxs/[.75rem] extra-tight px-2 font-medium'>{event.location}</div>
+        <div onClick={onClick} onDragEnd={dragEndEvent} draggable={true} className={`${Object.values(position).join(' ')} row-[span_${rowSpan}/_span_${rowSpan}] ${event.backgroundColor} ${event.border} ${event.textColor} ${event.link && 'cursor-pointer'} rounded-lg resize`} 
+        title={hoverText}>
+            <div className='text-xxs/[.75rem] extra-tight px-2 font-medium truncate'>{startHour % 12}{startHour > 12 ? 'PM' : 'AM'}</div>
+            <div className='text-sm px-2 font-medium truncate'>{event.title}</div>
+            <div className='text-xxs/[.75rem] extra-tight px-2 font-medium truncate'>{event.location}</div>
         </div>
     )
 }

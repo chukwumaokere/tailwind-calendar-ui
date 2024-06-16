@@ -8,7 +8,7 @@ Plan to use for some sites to show some events in a neat way
 TODOS:
 - [x] Drag and Drop
 - [x] Have drag and drop affect actual data
-- [ ] Fix drop in same location time changing to user local time
+- [x] Fix drop in same location time changing to user local time
 - [ ] Resize events 
 - [ ] Dynamically add/remove events
 - [ ] Truncate titles in events
@@ -19,8 +19,9 @@ TODOS:
 - [ ] Normalize const rowSpan for 24 hour format 
 - [x] Move calendar item to event component
 - [x] Add pointer to the event item
-- [ ] Add links to events
-- [ ] Allow height adjust
+- [x] Add links to events
+- [x] Allow height adjust
 - [x] Add hover effects
+- [x] Add hover tooltips
 - [ ] Add current day highlight
 
