@@ -84,46 +84,86 @@ function Event({event, onDragSuccess, logEvents}: {event: Event, onDragSuccess?:
     const startCol = event.startDate.getDay() + COLUMN_OFFSET;
     const rowSpan =  event.endDate.getHours() - startHour;
 
-    const onClick = useCallback(() => {
-        if(event.link) {
-            window.open(event.link, '_blank');
-        }
-    }, [event.link]);
+    const [previousMousePosition, setPreviousMousePosition] = useState({clientX: 0, clientY: 0});
 
     const [position, setPosition] = useState({
         Y: `row-start-[${startRow}]`,
-        X: `col-start-[${startCol}]`
+        X: `col-start-[${startCol}]`,
+        length: `row-[span_${rowSpan}/_span_${rowSpan}]`,
     });
 
-    const dragEndEvent = useCallback((dragEvent: React.DragEvent<HTMLDivElement>) => {
-        const tileUnderMouse = document.elementsFromPoint(dragEvent.clientX, dragEvent.clientY).find((element) => element.getAttribute('data-object') === 'tile') as HTMLDivElement;
+    const repositionElementAndCallOnSuccess = useCallback(({positionX, positionY, type = 'event'}: {positionX: number, positionY: number, type?: 'event' | 'resize'}) => {
+        const tileUnderMouse = document.elementsFromPoint(positionX, positionY).find((element) => element.getAttribute('data-object') === 'tile') as HTMLDivElement;
         const Y = tileUnderMouse.classList[0];
         const X = tileUnderMouse.classList[1];
-        setPosition({X, Y});
 
-        // Calculate new start and end dates based on the new position
-        const rowHourDroppedOn = parseInt(Y.replace('row-start-[', '').replace(']', '')) + HOUR_OFFSET;
-        const newStartHour = rowHourDroppedOn;
+        if (type === 'resize') {
+            const newRowSpan = parseInt(Y.replace('row-start-[', '').replace(']', '')) - parseInt(position.Y.replace('row-start-[', '').replace(']', '')) + 1;
+            setPosition((prev) => {
+                return {...prev, length: `row-[span_${newRowSpan}/_span_${newRowSpan}]`}
+            });
+            const newEndDate = new Date(event.endDate);
+            newEndDate.setHours(newEndDate.getHours() + newRowSpan - rowSpan);
+            onDragSuccess && onDragSuccess(event.id, new Date(event.startDate), newEndDate);
+            logEvents && console.log('ResizedEventEnd -', 'Event ID:', event.id, 'Start Date:', event.startDate);
+            logEvents && console.log('ResizedEventEnd -', 'Event ID', event.id, 'New End Date:', newEndDate);
+            return;
+        }
 
-        const columnDayDroppedOn = parseInt(X.replace('col-start-[', '').replace(']', ''));
+        if (type === 'event') {
+            setPosition((prev) => {
+                return {...prev, X, Y}
+            });
 
-        const newStartDate = new Date(event.startDate);
-        newStartDate.setHours(newStartHour);
-        newStartDate.setDate(event.startDate.getDate() + columnDayDroppedOn - startCol);
-        
-        const newEndDate = new Date(newStartDate);
-        newEndDate.setHours(newStartDate.getHours() + rowSpan);
+            // Calculate new start and end dates based on the new position
+            const rowHourDroppedOn = parseInt(Y.replace('row-start-[', '').replace(']', '')) + HOUR_OFFSET;
+            const newStartHour = rowHourDroppedOn;
 
-        onDragSuccess && onDragSuccess(event.id, newStartDate, newEndDate);
-        logEvents && console.log('Event ID:', event.id, 'New Start Date:', newStartDate);
-        logEvents && console.log('Event ID', event.id, 'New End Date:', newEndDate);
-    }, [event.startDate, startHour, rowSpan]);
+            const columnDayDroppedOn = parseInt(X.replace('col-start-[', '').replace(']', ''));
+            const newStartDate = new Date(event.startDate);
+            newStartDate.setHours(newStartHour);
+            newStartDate.setDate(event.startDate.getDate() + columnDayDroppedOn - startCol);
+            const newEndDate = new Date(newStartDate);
+            newEndDate.setHours(newStartDate.getHours() + rowSpan);
+            onDragSuccess && onDragSuccess(event.id, newStartDate, newEndDate);
+            logEvents && console.log('RepositionedEventEnd -', 'Event ID:', event.id, 'New Start Date:', newStartDate);
+            logEvents && console.log('RepositionedEventEnd -', 'Event ID', event.id, 'New End Date:', newEndDate);
+            return;
+        }
+    }, [position]);
+
+    const onClick = useCallback((mouseEvent: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        if (mouseEvent.type === 'mousedown') {
+            const {clientX, clientY} = mouseEvent;
+            setPreviousMousePosition({clientX, clientY});
+        }
+        if (mouseEvent.type === 'mouseup') {
+            const {clientX, clientY} = mouseEvent;
+            if (previousMousePosition.clientX === clientX && previousMousePosition.clientY === clientY) {
+                if (event.link) {
+                    return window.open(event.link, '_blank');
+                }
+            }
+            return repositionElementAndCallOnSuccess({positionX: clientX, positionY: clientY, type: 'resize'});
+        }
+    }, [event.link, previousMousePosition, repositionElementAndCallOnSuccess]);
+
+    const onDragEnd = useCallback((dragEvent: React.DragEvent<HTMLDivElement>) => {
+        repositionElementAndCallOnSuccess({positionX: dragEvent.clientX, positionY: dragEvent.clientY});
+    }, [event.startDate, startHour, rowSpan, repositionElementAndCallOnSuccess]);
 
     const hoverText = `${event.title} - ${event.location}\n${event.startDate.toLocaleString()} - ${event.endDate.toLocaleString()}`;
 
     return (
-        <div onClick={onClick} onDragEnd={dragEndEvent} draggable={true} className={`${Object.values(position).join(' ')} row-[span_${rowSpan}/_span_${rowSpan}] ${event.backgroundColor} ${event.border} ${event.textColor} ${event.link && 'cursor-pointer'} rounded-lg resize`} 
-        title={hoverText}>
+        <div 
+            data-object='event'
+            onMouseDown={onClick}
+            onMouseUp={onClick}
+            onClick={onClick} 
+            onDragEnd={onDragEnd} 
+            draggable={true} 
+            className={`${Object.values(position).join(' ')} ${event.backgroundColor} ${event.border} ${event.textColor} ${event.link && 'cursor-pointer'} rounded-lg resize-y overflow-auto`} 
+            title={hoverText}>
             <div className='text-xxs/[.75rem] extra-tight px-2 font-medium truncate'>{startHour % 12 === 0 ? '12' : startHour % 12}{startHour > 12 ? 'PM' : 'AM'}</div>
             <div className='text-sm px-2 font-medium truncate'>{event.title}</div>
             <div className='text-xxs/[.75rem] extra-tight px-2 font-medium truncate'>{event.location}</div>

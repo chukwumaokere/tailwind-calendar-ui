@@ -9,9 +9,10 @@ TODOS:
 - [x] Drag and Drop
 - [x] Have drag and drop affect actual data
 - [x] Fix drop in same location time changing to user local time
-- [ ] Resize events 
+- [ ] Rightclick copy delete menu
+- [x] Resize events 
 - [ ] Dynamically add/remove events
-- [ ] Truncate titles in events
+- [x] Truncate titles in events
 - [ ] Style title and subtitle
 - [ ] Support multiple months and weeks
 - [ ] Sticky header when scrolling through months
@@ -24,4 +25,4 @@ TODOS:
 - [x] Add hover effects
 - [x] Add hover tooltips
 - [ ] Add current day highlight
-
+- [ ] Add more increments to drop time rather than whole hour blocks
