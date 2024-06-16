@@ -84,6 +84,8 @@ function Event({event, onDragSuccess, logEvents}: {event: Event, onDragSuccess?:
     const startCol = event.startDate.getDay() + COLUMN_OFFSET;
     const rowSpan =  event.endDate.getHours() - startHour;
 
+    const [key, setKey] = useState(Math.random());
+
     const [previousMousePosition, setPreviousMousePosition] = useState({clientX: 0, clientY: 0});
 
     const [position, setPosition] = useState({
@@ -107,7 +109,7 @@ function Event({event, onDragSuccess, logEvents}: {event: Event, onDragSuccess?:
             onDragSuccess && onDragSuccess(event.id, new Date(event.startDate), newEndDate);
             logEvents && console.log('ResizedEventEnd -', 'Event ID:', event.id, 'Start Date:', event.startDate);
             logEvents && console.log('ResizedEventEnd -', 'Event ID', event.id, 'New End Date:', newEndDate);
-            return;
+            return setKey(Math.random());
         }
 
         if (type === 'event') {
@@ -156,6 +158,7 @@ function Event({event, onDragSuccess, logEvents}: {event: Event, onDragSuccess?:
 
     return (
         <div 
+            key={key}
             data-object='event'
             onMouseDown={onClick}
             onMouseUp={onClick}

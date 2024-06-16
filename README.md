@@ -11,6 +11,7 @@ TODOS:
 - [x] Fix drop in same location time changing to user local time
 - [ ] Rightclick copy delete menu
 - [x] Resize events 
+- [x] Have resize make the event snap. Might need to rerender (using key) because drag resizes element without row-span recalc
 - [ ] Dynamically add/remove events
 - [x] Truncate titles in events
 - [ ] Style title and subtitle
