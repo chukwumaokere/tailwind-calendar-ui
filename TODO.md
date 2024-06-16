@@ -1,0 +1,21 @@
+- [x] Drag and Drop
+- [x] Have drag and drop affect actual data
+- [x] Fix drop in same location time changing to user local time
+- [ ] Rightclick copy delete menu
+- [x] Resize events 
+- [x] Have resize make the event snap. Might need to rerender (using key) because drag resizes element without row-span recalc
+- [ ] Dynamically add/remove events
+- [x] Truncate titles in events
+- [ ] Style title and subtitle
+- [ ] Support multiple months and weeks
+- [ ] Sticky header when scrolling through months
+- [ ] Swap between list and Calendar?
+- [ ] Normalize const rowSpan for 24 hour format 
+- [x] Move calendar item to event component
+- [x] Add pointer to the event item
+- [x] Add links to events
+- [x] Allow height adjust
+- [x] Add hover effects
+- [x] Add hover tooltips
+- [ ] Add current day highlight
+- [ ] Add more increments to drop time rather than whole hour blocks

@@ -19,7 +19,8 @@ function App() {
   return (
     <div className='bg-slate-900 h-full min-h-[inherit]'>
       <div className='flex flex-col'>
-        <h2 className='text-lg text-white font-bold'>Options</h2>
+        <a href="https://github.com/chukwumaokere/tailwind-calendar-ui" target="_blank" className='underline hover:text-white/80 text-white text-2xl font-bold'>Tailwind Calendar UI</a>
+        <h2 className='text-lg text-white font-semibold'>Options</h2>
         <div>
           <input type="checkbox" id="draggable" checked={draggable} onChange={() => setDraggable(!draggable)} />
           <label className='text-white' htmlFor="draggable">Draggable</label>
