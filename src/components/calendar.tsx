@@ -1,5 +1,19 @@
 import { useState, useCallback } from 'react';
 
+export interface CalendarProps { 
+    title?: string, 
+    subtitle?: string, 
+    days?: string[], 
+    hours?: string[], 
+    events: Event[],
+    draggable?: boolean,
+    resizable?: boolean,
+    maxHeight?: string,
+    showCalendarDateLabel?: boolean,
+    onDragSuccess?: (id: Event['id'], startDate: Date, endDate: Date) => void,
+    logEvents?: boolean,
+}
+
 export interface Event { 
     id: string | number,
     title: string;
@@ -30,19 +44,7 @@ const DEFAULT_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const DEFAULT_HOURS = ['5AM', '6AM', '7AM', '8AM', '9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10PM', '11PM', '12AM', '1AM', '2AM', '3AM', '4AM'];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export interface CalendarProps { 
-    title?: string, 
-    subtitle?: string, 
-    days?: string[], 
-    hours?: string[], 
-    events: Event[],
-    maxHeight?: string,
-    showCalendarDateLabel?: boolean,
-    onDragSuccess?: (id: Event['id'], startDate: Date, endDate: Date) => void,
-    logEvents?: boolean,
-}
-
-export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = DEFAULT_HOURS, events, maxHeight, showCalendarDateLabel = false, onDragSuccess, logEvents = false}: CalendarProps) {
+export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = DEFAULT_HOURS, events, maxHeight, showCalendarDateLabel = false, onDragSuccess, draggable = false, resizable = false, logEvents = false}: CalendarProps) {
     const currentDate = new Date();
     const TILES = days.length * hours.length;
     return (
@@ -70,7 +72,7 @@ export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = 
 
                 {/* Events Processing */}
                 {events.map((event, index) => {
-                    return <Event key={index} event={event} onDragSuccess={onDragSuccess} logEvents={logEvents} />
+                    return <Event key={index} event={event} onDragSuccess={onDragSuccess} draggable={draggable} resizable={resizable} logEvents={logEvents} />
                 })}
                 {/* /Events Processing */}
             </div>
@@ -78,7 +80,7 @@ export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = 
     )
 }
 
-function Event({event, onDragSuccess, logEvents}: {event: Event, onDragSuccess?: CalendarProps['onDragSuccess'], logEvents?: CalendarProps['logEvents']}) {
+function Event({event, onDragSuccess, draggable, resizable, logEvents}: {event: Event, onDragSuccess?: CalendarProps['onDragSuccess'], draggable?: CalendarProps['draggable'], resizable?: CalendarProps['resizable'], logEvents?: CalendarProps['logEvents']}) {
     const startHour = event.startDate.getHours();
     const startRow = startHour - HOUR_OFFSET;
     const startCol = event.startDate.getDay() + COLUMN_OFFSET;
@@ -95,11 +97,17 @@ function Event({event, onDragSuccess, logEvents}: {event: Event, onDragSuccess?:
     });
 
     const repositionElementAndCallOnSuccess = useCallback(({positionX, positionY, type = 'event'}: {positionX: number, positionY: number, type?: 'event' | 'resize'}) => {
+        if(!draggable && !resizable) {
+            return;
+        }
         const tileUnderMouse = document.elementsFromPoint(positionX, positionY).find((element) => element.getAttribute('data-object') === 'tile') as HTMLDivElement;
         const Y = tileUnderMouse.classList[0];
         const X = tileUnderMouse.classList[1];
 
         if (type === 'resize') {
+            if (!resizable) {
+                return;
+            }
             const newRowSpan = parseInt(Y.replace('row-start-[', '').replace(']', '')) - parseInt(position.Y.replace('row-start-[', '').replace(']', '')) + 1;
             setPosition((prev) => {
                 return {...prev, length: `row-[span_${newRowSpan}/_span_${newRowSpan}]`}
@@ -113,6 +121,9 @@ function Event({event, onDragSuccess, logEvents}: {event: Event, onDragSuccess?:
         }
 
         if (type === 'event') {
+            if (!draggable) {
+                return;
+            }
             setPosition((prev) => {
                 return {...prev, X, Y}
             });
@@ -132,7 +143,7 @@ function Event({event, onDragSuccess, logEvents}: {event: Event, onDragSuccess?:
             logEvents && console.log('RepositionedEventEnd -', 'Event ID', event.id, 'New End Date:', newEndDate);
             return;
         }
-    }, [position]);
+    }, [position, resizable, draggable, logEvents]);
 
     const onClick = useCallback((mouseEvent: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         if (mouseEvent.type === 'mousedown') {
@@ -164,8 +175,8 @@ function Event({event, onDragSuccess, logEvents}: {event: Event, onDragSuccess?:
             onMouseUp={onClick}
             onClick={onClick} 
             onDragEnd={onDragEnd} 
-            draggable={true} 
-            className={`${Object.values(position).join(' ')} ${event.backgroundColor} ${event.border} ${event.textColor} ${event.link && 'cursor-pointer'} rounded-lg resize-y overflow-auto`} 
+            draggable={draggable} 
+            className={`${Object.values(position).join(' ')} ${event.backgroundColor} ${event.border} ${event.textColor} ${event.link && 'cursor-pointer'} rounded-lg ${resizable && 'resize-y'} overflow-auto`} 
             title={hoverText}>
             <div className='text-xxs/[.75rem] extra-tight px-2 font-medium truncate'>{startHour % 12 === 0 ? '12' : startHour % 12}{startHour > 12 ? 'PM' : 'AM'}</div>
             <div className='text-sm px-2 font-medium truncate'>{event.title}</div>
