@@ -38,7 +38,17 @@ function App() {
           <label className='text-white' htmlFor="calendarDateLabel">Calendar Date Label</label>
         </div>
       </div>
-      <Calendar title="Pinót's Calendar" subtitle='A day in my life' events={events} maxHeight={'max-h-[36rem]'} onDragSuccess={onDragSuccess} draggable={draggable} resizable={resizable} showCalendarDateLabel={calendarDateLabel} logEvents={logEvents} />
+      <Calendar 
+        title="Pinót's Calendar"
+        subtitle='A day in my life'
+        events={events}
+        maxHeight={'max-h-[36rem]'}
+        onDragSuccess={onDragSuccess}
+        draggable={draggable}
+        resizable={resizable}
+        showCalendarDateLabel={calendarDateLabel}
+        logEvents={logEvents} 
+      />
     </div>
   )
 }
