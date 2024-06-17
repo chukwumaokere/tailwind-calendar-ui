@@ -17,5 +17,7 @@
 - [x] Allow height adjust
 - [x] Add hover effects
 - [x] Add hover tooltips
+- [x] Maybe use height rounded to the neearest 50px for dragging rather than key refresh (using both)
 - [ ] Add current day highlight
 - [ ] Add more increments to drop time rather than whole hour blocks
+- [x] Fix drag and drop icon on tiles and over events

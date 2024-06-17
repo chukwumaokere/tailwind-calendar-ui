@@ -31,6 +31,8 @@ const ROW_OFFSET = 2;
 const COLUMN_OFFSET = 2;
 const HOUR_OFFSET = 3;
 const MONTH_OFFSET = 0;
+const TILE_DEFAULT_HEIGHT = 50;
+const TILE_DEFAULT_WIDTH = 150;
 
 function getTileRowNumber(index: number, denominator: number) {
     return Math.floor(index / denominator) + ROW_OFFSET;
@@ -52,7 +54,7 @@ export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = 
             {title ? <h1 className='text-2xl text-white'>{title}</h1> : null}
             {subtitle ? <h1 className='text-xl text-white'>{subtitle}</h1> : null}
             {showCalendarDateLabel ? <h1 className='text-xl text-white'>{MONTHS[currentDate.getMonth() + MONTH_OFFSET]} {currentDate.getFullYear()}</h1> : null}
-            <div className={`overflow-auto grid grid-cols-[70px,repeat(${days.length},150px)] grid-rows-[auto,repeat(${hours.length},50px)] ${maxHeight} w-fit px-1`}>
+            <div className={`overflow-auto grid grid-cols-[70px,repeat(${days.length},${TILE_DEFAULT_WIDTH}px)] grid-rows-[auto,repeat(${hours.length},${TILE_DEFAULT_HEIGHT}px)] ${maxHeight} w-fit px-1`}>
                 {/*Empty Corner Tile*/}
                 <div className="row-start-[1] col-start-[1] sticky top-0 z-10 bg-white dark:bg-gradient-to-b dark:from-slate-600 dark:to-slate-700 border-slate-100 dark:border-black/10 bg-clip-padding text-slate-900 dark:text-slate-200 border-b text-sm font-medium py-2"></div>
                 
@@ -65,7 +67,13 @@ export default function Calendar({title, subtitle, days = DEFAULT_DAYS, hours = 
                 ))}
                 {Array.from({length: TILES}).map((_, index) => {
                     return (
-                        <div key={index} data-object="tile" className={`row-start-[${getTileRowNumber(index, days.length)}] col-start-[${getTileColumnNumber(index, days.length)}] border-slate-100 dark:border-slate-200/5 border-b border-r`}></div>
+                        <div 
+                            key={index} 
+                            data-object="tile" 
+                            className={`row-start-[${getTileRowNumber(index, days.length)}] col-start-[${getTileColumnNumber(index, days.length)}] border-slate-100 dark:border-slate-200/5 border-b border-r`} 
+                            onDragOver={(event) => event.preventDefault()} 
+                            onDrop={(event) => event.preventDefault()}
+                        />
                     )
                 })}
                 {/* /Calendar Setup*/}
@@ -89,6 +97,7 @@ function Event({event, onDragSuccess, draggable, resizable, logEvents}: {event: 
     const [key, setKey] = useState(Math.random());
 
     const [previousMousePosition, setPreviousMousePosition] = useState({clientX: 0, clientY: 0});
+    const [eventHeight, setEventHeight] = useState(TILE_DEFAULT_HEIGHT * rowSpan);
 
     const [position, setPosition] = useState({
         Y: `row-start-[${startRow}]`,
@@ -109,6 +118,7 @@ function Event({event, onDragSuccess, draggable, resizable, logEvents}: {event: 
                 return;
             }
             const newRowSpan = parseInt(Y.replace('row-start-[', '').replace(']', '')) - parseInt(position.Y.replace('row-start-[', '').replace(']', '')) + 1;
+            setEventHeight(Math.ceil(newRowSpan * TILE_DEFAULT_HEIGHT));
             setPosition((prev) => {
                 return {...prev, length: `row-[span_${newRowSpan}/_span_${newRowSpan}]`}
             });
@@ -174,9 +184,12 @@ function Event({event, onDragSuccess, draggable, resizable, logEvents}: {event: 
             onMouseDown={onClick}
             onMouseUp={onClick}
             onClick={onClick} 
-            onDragEnd={onDragEnd} 
+            onDragEnd={onDragEnd}
+            onDragOver={(event) => event.preventDefault()} 
+            onDrop={(event) => event.preventDefault()}
             draggable={draggable} 
             className={`${Object.values(position).join(' ')} ${event.backgroundColor} ${event.border} ${event.textColor} ${event.link && 'cursor-pointer'} rounded-lg ${resizable && 'resize-y'} overflow-auto`} 
+            style={{height: eventHeight}}
             title={hoverText}>
             <div className='text-xxs/[.75rem] extra-tight px-2 font-medium truncate'>{startHour % 12 === 0 ? '12' : startHour % 12}{startHour > 12 ? 'PM' : 'AM'}</div>
             <div className='text-sm px-2 font-medium truncate'>{event.title}</div>
