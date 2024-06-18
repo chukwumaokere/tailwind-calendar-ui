@@ -21,3 +21,4 @@
 - [ ] Add current day highlight
 - [ ] Add more increments to drop time rather than whole hour blocks
 - [x] Fix drag and drop icon on tiles and over events
+- [ ] Add animations (drag resize event/snap when dropped) with react-spring (click bouncy resize, right click popover), framer motion
